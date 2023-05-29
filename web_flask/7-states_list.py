@@ -1,24 +1,27 @@
 #!/usr/bin/python3
-"""Return string when navigating to root dir"""
-from flask import Flask, render_template, g
-import models
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Mar  1 11:15:54 2023
+@author: @author: Nancy Idiong & Niyi Abidogun
+"""
+from models import storage
 from models.state import State
-
-
-app = Flask(__name__, template_folder='templates')
-
-
-@app.route('/states_list', strict_slashes=False)
-def list_states():
-    """view that lists all of the states"""
-    states = models.storage.all(State).values()
-    return render_template('7-states_list.html', states=states)
+from flask import Flask, render_template
+app = Flask(__name__)
 
 
 @app.teardown_appcontext
-def tear_down(error):
-    """remove the current SQLAlchemy Session"""
-    models.storage.close()
+def appcontext_teardown(self):
+    """use storage for fetching data from the storage engine
+    """
+    storage.close()
+
+
+@app.route('/states_list', strict_slashes=False)
+def state_info():
+    """Display a HTML page inside the tag BODY"""
+    return render_template('7-states_list.html',
+                           states=storage.all(State))
 
 
 if __name__ == '__main__':
